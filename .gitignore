@@ -1,0 +1,22 @@
+# Ignore Terraform state files
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
+
+# Ignore any temporary files
+*.tfvars
+*.tfplan
+
+# Ignore provider plugin files
+.terraform/
+
+# Ignore local override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+.DS_Store
