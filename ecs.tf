@@ -270,6 +270,8 @@ resource "aws_ecs_service" "tf_ecs_service" {
     container_port   = 80
   }
 
+  enable_execute_command = true
+
   # lifecycle {
   #   ignore_changes = [
   #     task_definition
