@@ -170,6 +170,10 @@ resource "aws_ecs_task_definition" "main" {
         {
             name = "FIREBASE_PROJECT_ID",
             value = "pairly-8c80b"
+        },
+        {
+            name = "DB_DATABASE",
+            value = "pairlydb"
         }
     ],
     secrets = [
