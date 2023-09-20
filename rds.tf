@@ -8,9 +8,9 @@ resource "aws_db_instance" "rds" {
 
     # DB
     identifier             = "pairly-backend-rds"
-    db_name                = "pairlydb"
-    username               = "admin"
-    password               = "password"
+    db_name                = var.rds.db_name
+    username               = var.rds.username
+    password               = var.rds.password
 
     # インスタンス
     instance_class         = "db.t3.micro"

@@ -2,8 +2,8 @@
 # レコードの作成（ALBを登録）
 #################################################
 resource "aws_route53_record" "alb_record" {
-  zone_id = "Z09662563QYNKPGX0IH3T"  # ホストゾーンの Zone ID を指定してください
-  name    = "api.pairly.life"  # ドメイン名を指定してください
+  zone_id = var.route53.zone_id
+  name    = var.route53.domain
   type    = "A"
 
   alias {

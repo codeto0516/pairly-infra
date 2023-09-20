@@ -2,7 +2,7 @@
 # クラスター
 ####################################################
 resource "aws_ecs_cluster" "terafform_cluster" {
-  name = "terraform_cluster"
+  name = "pairly_cluster"
 }
 
 resource "aws_ecs_cluster_capacity_providers" "provider" {
@@ -14,16 +14,9 @@ resource "aws_ecs_cluster_capacity_providers" "provider" {
 # Cloud Watch Log Group
 ####################################################
 resource "aws_cloudwatch_log_group" "nginx" {
-  # name              = "/ecs/logs/terraform/nginx"
-  # name              = "/ecs/logs/terraform/rails"
   name              = "/ecs/"
   retention_in_days = 1
 }
-
-# resource "aws_cloudwatch_log_group" "rails" {
-#   name              = "/ecs/"
-#   retention_in_days = 1
-# }
 
 ####################################################
 # IAM
@@ -130,7 +123,7 @@ resource "aws_iam_policy" "ecs_exec_role" {
 #   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 #   requires_compatibilities = ["FARGATE"]
 #   tags = {
-#     "Name" = "terraform"
+#     "Name" = "pairly"
 #   }
 # }
 
@@ -174,6 +167,10 @@ resource "aws_ecs_task_definition" "main" {
         {
             name = "DB_DATABASE",
             value = "pairlydb"
+        },
+        {
+            "name": "FIREBASE_STORAGE_BUCKET",
+            "value": "pairly-8c80b.appspot.com"
         }
     ],
     secrets = [
@@ -200,6 +197,10 @@ resource "aws_ecs_task_definition" "main" {
         {
             name = "FIREBASE_API_KEY",
             valueFrom = "/pairly-backend/firebase/api-key",
+        },
+        {
+            "name": "FIREBASE_SERVICE_ACCOUNT_KEY",
+            "valueFrom": "/pairly-backend/firebase/service-account-key"
         }
 
     ],
@@ -208,7 +209,7 @@ resource "aws_ecs_task_definition" "main" {
         options = {
             awslogs-group = "/ecs/",
             awslogs-region = "ap-northeast-1",
-            awslogs-stream-prefix = "terraform",
+            awslogs-stream-prefix = "pairly",
         }
     }
   }])
@@ -223,7 +224,7 @@ resource "aws_ecs_task_definition" "main" {
     cpu_architecture        = "X86_64"
   }
   tags = {
-    "Name" = "terraform"
+    "Name" = "pairly"
   }
 }
 
@@ -231,7 +232,7 @@ resource "aws_ecs_task_definition" "main" {
 # サービス
 ####################################################
 resource "aws_ecs_service" "tf_ecs_service" {
-  name = "terraform_ecs"
+  name = "pairly_ecs"
   cluster       = aws_ecs_cluster.terafform_cluster.id
   task_definition = aws_ecs_task_definition.main.arn
 
@@ -260,7 +261,7 @@ resource "aws_ecs_service" "tf_ecs_service" {
 
 
   tags = {
-    "Name" = "terraform"
+    "Name" = "pairly"
   }
 
   load_balancer {
