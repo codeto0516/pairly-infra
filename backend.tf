@@ -9,7 +9,7 @@ terraform {
       version = "~> 5.0"
     }
   }
-    backend "s3" {
+  backend "s3" {
     bucket = "terraform-tfstate-3423423"
     key    = "terraform.tfstate"
     region = "ap-northeast-1"
