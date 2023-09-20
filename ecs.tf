@@ -46,7 +46,8 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
     "${aws_iam_policy.ecs_to_ecr_policy.arn}",
-    "${aws_iam_policy.ssm_policy.arn}"
+    "${aws_iam_policy.ssm_policy.arn}",
+    "${aws_iam_policy.ecs_exec_role.arn}"
   ]
   description = "Allows ECS tasks to call AWS services on your behalf."
   name        = "ecsTaskExecutionRole"
@@ -96,6 +97,24 @@ resource "aws_iam_policy" "ssm_policy" {
   })
 }
 
+resource "aws_iam_policy" "ecs_exec_role" {
+  name = "ecs-exec-role"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "ecs:ExecuteCommand",
+          "ssm:StartSession",
+          "ecs:DescribeTasks"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
 
 
 ####################################################
@@ -151,6 +170,10 @@ resource "aws_ecs_task_definition" "main" {
         {
             name = "FIREBASE_PROJECT_ID",
             value = "pairly-8c80b"
+        },
+        {
+            name = "DB_DATABASE",
+            value = "pairlydb"
         }
     ],
     secrets = [
@@ -192,6 +215,7 @@ resource "aws_ecs_task_definition" "main" {
   cpu                       = 256
   memory                    = 512
   network_mode              = "awsvpc"
+  task_role_arn = aws_iam_role.ecs_task_execution_role.arn
   execution_role_arn        = aws_iam_role.ecs_task_execution_role.arn
   requires_compatibilities  = ["FARGATE"]
   runtime_platform {
@@ -245,6 +269,8 @@ resource "aws_ecs_service" "tf_ecs_service" {
     container_name   = "pairly-backend"
     container_port   = 80
   }
+
+  enable_execute_command = true
 
   # lifecycle {
   #   ignore_changes = [
